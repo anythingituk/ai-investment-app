@@ -95,6 +95,74 @@ Security requirements:
 - Shut down the local server cleanly when the app exits.
 - Log actions but avoid logging full secret values.
 
+## Windows App Updates
+
+The Windows app should support update awareness from GitHub releases.
+
+MVP update behaviour:
+
+- Add an `Check for Updates` command in settings or the tray menu.
+- Automatically check GitHub releases periodically, for example once per day.
+- Compare the installed app version with the latest GitHub release version.
+- Notify the user when an update is available.
+- Open the GitHub release page or installer download for manual installation.
+- Do not silently install updates in the MVP.
+
+Later update behaviour:
+
+- Support signed installers.
+- Verify installer checksums or signatures before running an update.
+- Offer one-click update install after user confirmation.
+- Show release notes before updating.
+- Allow update checks to be disabled.
+
+Update checks should be cheap, rate-limit friendly, and should not require a GitHub token for public release metadata where possible.
+
+## Multi-Computer Data Strategy
+
+The app may need to run on up to three private computers in different locations.
+
+MVP data behaviour:
+
+- Use local SQLite first for speed, privacy, offline access, and simpler development.
+- Keep the data access layer provider-based so a cloud database or sync layer can be added later.
+- Store machine-specific settings separately from shared investment research data where practical.
+- Avoid putting API keys or local secrets into shared cloud tables.
+- Prefer record-level sync between local SQLite and cloud storage, not raw SQLite file syncing.
+- Support explicit sync triggers on app startup, manual app launch, and tray exit once cloud sync is implemented.
+
+Viable low-cost options for multi-computer use:
+
+| Option | Role | Notes |
+|---|---|---|
+| Local SQLite with manual backup/export | Simplest MVP | Cheapest and safest to build first, but no automatic cross-device sync. |
+| SQLite plus cloud file sync | Simple sync | Possible with OneDrive/Dropbox, but risky if multiple devices write at the same time. Better for backup than live sync. |
+| Supabase Postgres | Cloud database | Low-cost managed Postgres with authentication, APIs, backups, and a generous free/low-cost tier. Good candidate for later shared data. |
+| Neon Postgres | Cloud database | Low-cost serverless Postgres. Good for structured data, but app must handle cold starts and connection management. |
+| Azure SQL Database | Microsoft cloud database | Strong Windows/Microsoft fit, but usually more expensive and heavier than needed for a private MVP. |
+| LiteFS/Turso/libSQL | SQLite-style cloud sync | Attractive if keeping SQLite semantics matters, but check Windows/.NET support carefully before committing. |
+| Self-hosted Postgres on a VPS | Cheapest long-term control | More admin work: backups, security patches, firewalling, TLS, monitoring. |
+
+Recommended direction:
+
+- Build Phase 1-3 on local SQLite.
+- Add backup/export early.
+- Design repositories/services so storage can later move to Postgres without rewriting dashboard or AI logic.
+- If cross-device sync becomes necessary, prefer Supabase Postgres or Neon Postgres before attempting cloud-file SQLite sync.
+- If self-hosting is preferred, PostgreSQL on an existing Linode server is a strong low-cost option, provided backups, firewalling, TLS/VPN access, and patching are handled properly.
+
+Sync behaviour, once enabled:
+
+- Sync on application startup, including Windows startup tray launch.
+- Sync when the app is manually opened.
+- Sync periodically in the background using a configurable interval.
+- Attempt a final sync when the user exits from the system tray.
+- Show clear sync status: idle, syncing, success, warning, error, offline.
+- Do not block app shutdown indefinitely if final sync fails; log the failure and show a concise warning if appropriate.
+- Keep sync pause/control separate from `Pause AI`. Pausing AI should stop market/AI/background research activity, but should not automatically prevent data sync unless the user explicitly pauses sync too.
+- Use per-device IDs and UTC timestamps for sync conflict handling.
+- Prefer append-only or versioned records for AI runs, job logs, usage logs, market snapshots, and research reports.
+
 ## Tray Menu MVP
 
 Implement this first:
@@ -111,6 +179,7 @@ Exit
 Later additions:
 
 ```text
+Check for Updates
 Run Quick Scan
 Run Deep Research
 Update Prices Now
@@ -557,6 +626,24 @@ Success test:
 Can the app monitor selected companies in the background and alert only when meaningful changes occur?
 ```
 
+### Phase 6a - Updates and Multi-Computer Sync
+
+Build:
+
+- GitHub release update checker.
+- Installed version tracking.
+- User-visible update notification.
+- Manual update download/open action.
+- Backup/export workflow.
+- Storage abstraction review for future cloud database support.
+- Optional cloud database proof of concept if multi-computer use becomes a current requirement.
+
+Success test:
+
+```text
+Can the app tell the user when a newer GitHub release is available, and is the data layer ready for a future shared database without a major rewrite?
+```
+
 ### Phase 7 - Advanced Investment Logic
 
 Build:
@@ -602,7 +689,6 @@ Do not build these in the MVP:
 - Automated buying/selling.
 - Fully autonomous investment decisions.
 - Public multi-user accounts.
-- Cloud sync.
 - Mobile app.
 - Tax filing/reporting.
 - Hourly deep research across hundreds of companies.

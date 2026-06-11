@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Investment AI Dashboard Mockup</title>
+  <style>
+    :root {
+      --bg: #0b0f17;
+      --panel: #111827;
+      --panel-2: #162033;
+      --line: rgba(255,255,255,0.08);
+      --text: #edf2f7;
+      --muted: #9aa8bd;
+      --green: #46d37d;
+      --orange: #ffb020;
+      --red: #ff5c5c;
+      --purple: #9a6cff;
+      --blue: #5ca8ff;
+      --chip: rgba(154,108,255,0.16);
+      --shadow: 0 24px 60px rgba(0,0,0,0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(154,108,255,0.22), transparent 28rem),
+        radial-gradient(circle at top right, rgba(70,211,125,0.12), transparent 26rem),
+        var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: 100vh;
+    }
+
+    aside {
+      border-right: 1px solid var(--line);
+      background: rgba(8, 13, 23, 0.88);
+      backdrop-filter: blur(20px);
+      padding: 22px 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .brand img {
+      width: 48px;
+      height: 48px;
+      filter: drop-shadow(0 8px 20px rgba(154,108,255,0.35));
+    }
+
+    .brand-title {
+      line-height: 1.15;
+    }
+
+    .brand-title strong {
+      display: block;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+    }
+
+    .brand-title span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      padding: 11px 12px;
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    nav a.active {
+      background: var(--chip);
+      color: var(--text);
+      border: 1px solid rgba(154,108,255,0.28);
+    }
+
+    nav a:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+    }
+
+    .status-box {
+      margin-top: 28px;
+      padding: 14px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, rgba(70,211,125,0.13), rgba(255,255,255,0.03));
+      border: 1px solid rgba(70,211,125,0.22);
+    }
+
+    .status-box .label {
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      margin-right: 7px;
+      box-shadow: 0 0 15px var(--green);
+    }
+
+    main {
+      padding: 24px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .page-title h1 {
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: -0.7px;
+    }
+
+    .page-title p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    select, button {
+      border: 1px solid var(--line);
+      background: rgba(17,24,39,0.95);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    select {
+      min-width: 230px;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--purple), #5c7cff);
+      border: 0;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(22,32,51,0.96), rgba(17,24,39,0.96));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .span-3 { grid-column: span 3; }
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-7 { grid-column: span 7; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .metric {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+    }
+
+    .positive { color: var(--green); }
+    .warning { color: var(--orange); }
+    .danger { color: var(--red); }
+    .muted { color: var(--muted); }
+
+    .small {
+      font-size: 13px;
+      margin-top: 6px;
+      color: var(--muted);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      color: var(--muted);
+      border: 1px solid var(--line);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th {
+      text-align: left;
+      color: var(--muted);
+      font-weight: 600;
+      padding: 12px 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    td {
+      padding: 13px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    tr:hover td {
+      background: rgba(255,255,255,0.025);
+    }
+
+    .score {
+      font-weight: 800;
+      color: var(--green);
+    }
+
+    .tag {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: rgba(92,168,255,0.14);
+      color: #9bcaff;
+    }
+
+    .tag.orange {
+      background: rgba(255,176,32,0.13);
+      color: #ffd18a;
+    }
+
+    .tag.red {
+      background: rgba(255,92,92,0.13);
+      color: #ffaaaa;
+    }
+
+    .suggestion {
+      display: grid;
+      gap: 12px;
+    }
+
+    .suggestion-item {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255,255,255,0.035);
+    }
+
+    .suggestion-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .suggestion-title {
+      font-weight: 800;
+    }
+
+    .sector-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .sector {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--line);
+    }
+
+    .sector strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .activity {
+      display: grid;
+      gap: 10px;
+    }
+
+    .activity-row {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 1fr; }
+      aside { display: none; }
+      .span-3, .span-4, .span-5, .span-7, .span-8, .span-12 {
+        grid-column: span 12;
+      }
+      header { flex-direction: column; align-items: flex-start; }
+      .controls { width: 100%; flex-wrap: wrap; }
+      select { flex: 1; min-width: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <div class="brand">
+        <img src="data:image/png;base64,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" alt="Investment app icon" />
+        <div class="brand-title">
+          <strong>AlphaTray</strong>
+          <span>Private AI investment dashboard</span>
+        </div>
+      </div>
+
+      <nav>
+        <a class="active" href="#">Dashboard <span>●</span></a>
+        <a href="#">Opportunities</a>
+        <a href="#">Research Queue</a>
+        <a href="#">Watchlist</a>
+        <a href="#">Sectors & Indexes</a>
+        <a href="#">Short Watch</a>
+        <a href="#">Portfolio</a>
+        <a href="#">AI Budget</a>
+        <a href="#">Settings</a>
+      </nav>
+
+      <div class="status-box">
+        <div class="label">Background activity</div>
+        <div><span class="status-dot"></span><strong>AI Active</strong></div>
+        <div class="small">Next scan: 14:00 • Budget: £42.18 used</div>
+      </div>
+    </aside>
+
+    <main>
+      <header>
+        <div class="page-title">
+          <h1>Investment Command Dashboard</h1>
+          <p>AI-assisted screening, research monitoring, sector context and human review queue.</p>
+        </div>
+
+        <div class="controls">
+          <select aria-label="Market filter">
+            <option>Show all - FTSE, DOW, S&P, Nasdaq, AIM</option>
+            <option>Show my saved</option>
+            <option>Show by category</option>
+            <option>FTSE 100</option>
+            <option>FTSE 250</option>
+            <option>FTSE AIM</option>
+            <option>DOW</option>
+            <option>S&P 500</option>
+            <option>Nasdaq</option>
+            <option>£1-£10 share candidates</option>
+            <option>Long opportunities</option>
+            <option>Short watch only</option>
+          </select>
+          <button class="primary">Run Scan Now</button>
+        </div>
+      </header>
+
+      <section class="grid">
+        <div class="card span-3">
+          <div class="metric-label">Cash available</div>
+          <div class="metric">£10,000</div>
+          <div class="small">Reserve: £1,000 • Deployable: £9,000</div>
+        </div>
+
+        <div class="card span-3">
+          <div class="metric-label">AI status</div>
+          <div class="metric positive">Active</div>
+          <div class="small">2 jobs running • 6 queued</div>
+        </div>
+
+        <div class="card span-3">
+          <div class="metric-label">Research alerts</div>
+          <div class="metric warning">7</div>
+          <div class="small">3 high priority • 4 watchlist</div>
+        </div>
+
+        <div class="card span-3">
+          <div class="metric-label">API budget</div>
+          <div class="metric">£42.18</div>
+          <div class="small">Used this month of £200 cap</div>
+        </div>
+
+        <div class="card span-8">
+          <div class="section-title">
+            <h2>AI-ranked £1-£10 share candidates</h2>
+            <span class="pill">Filtered: Show all</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>Company</th>
+                <th>Market</th>
+                <th>Sector</th>
+                <th>Price</th>
+                <th>AI Score</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ABC</td>
+                <td>ABC plc</td>
+                <td>FTSE 250</td>
+                <td>Industrials</td>
+                <td>£4.20</td>
+                <td class="score">84</td>
+                <td><span class="tag">Long Review</span></td>
+              </tr>
+              <tr>
+                <td>LGN</td>
+                <td>Legal & General</td>
+                <td>FTSE 100</td>
+                <td>Financials</td>
+                <td>£2.48</td>
+                <td class="score">79</td>
+                <td><span class="tag">Income Watch</span></td>
+              </tr>
+              <tr>
+                <td>XYZ</td>
+                <td>XYZ Holdings</td>
+                <td>AIM</td>
+                <td>Technology</td>
+                <td>£1.36</td>
+                <td class="warning">68</td>
+                <td><span class="tag orange">High Volatility</span></td>
+              </tr>
+              <tr>
+                <td>DEF</td>
+                <td>DEF Ltd</td>
+                <td>DOW</td>
+                <td>Consumer</td>
+                <td>$7.80</td>
+                <td class="danger">72 bearish</td>
+                <td><span class="tag red">Short Watch</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card span-4">
+          <div class="section-title">
+            <h2>AI suggestions</h2>
+            <span class="pill">Human approval required</span>
+          </div>
+          <div class="suggestion">
+            <div class="suggestion-item">
+              <div class="suggestion-top">
+                <span class="suggestion-title">Review ABC plc</span>
+                <span class="tag">Long</span>
+              </div>
+              <div class="small">Entered buy-zone filter, positive volume trend, sector improving. Spread acceptable.</div>
+            </div>
+            <div class="suggestion-item">
+              <div class="suggestion-top">
+                <span class="suggestion-title">Monitor DEF Ltd</span>
+                <span class="tag red">Short</span>
+              </div>
+              <div class="small">Bearish setup detected, but squeeze risk is elevated. Do not act without review.</div>
+            </div>
+            <div class="suggestion-item">
+              <div class="suggestion-top">
+                <span class="suggestion-title">Pause XYZ deep research?</span>
+                <span class="tag orange">Cost</span>
+              </div>
+              <div class="small">Repeated analysis produced low confidence. Suggested downgrade to watch-only.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card span-7">
+          <div class="section-title">
+            <h2>Sector and index snapshot</h2>
+            <span class="pill">Updated 13:42</span>
+          </div>
+          <div class="sector-grid">
+            <div class="sector"><strong>FTSE 100</strong><span class="positive">+0.42%</span></div>
+            <div class="sector"><strong>FTSE 250</strong><span class="muted">-0.08%</span></div>
+            <div class="sector"><strong>AIM</strong><span class="positive">+1.12%</span></div>
+            <div class="sector"><strong>DOW</strong><span class="positive">+0.35%</span></div>
+            <div class="sector"><strong>S&P 500</strong><span class="positive">+0.61%</span></div>
+            <div class="sector"><strong>Nasdaq</strong><span class="warning">Overextended</span></div>
+          </div>
+        </div>
+
+        <div class="card span-5">
+          <div class="section-title">
+            <h2>AI activity log</h2>
+            <span class="pill">Live</span>
+          </div>
+          <div class="activity">
+            <div class="activity-row"><span>Low-price scanner</span><strong class="positive">Complete</strong></div>
+            <div class="activity-row"><span>News monitor</span><strong class="warning">Running</strong></div>
+            <div class="activity-row"><span>Technical agent</span><strong>Queued</strong></div>
+            <div class="activity-row"><span>Deep research</span><strong>2 companies</strong></div>
+            <div class="activity-row"><span>Cloud sync</span><strong class="positive">Connected</strong></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
