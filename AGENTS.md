@@ -156,12 +156,39 @@ Sync behaviour, once enabled:
 - Sync on application startup, including Windows startup tray launch.
 - Sync when the app is manually opened.
 - Sync periodically in the background using a configurable interval.
+- Sync after meaningful task completion when local data has changed, such as after AI research, broad scans, alert generation, settings edits, watchlist edits, or portfolio/cash edits.
 - Attempt a final sync when the user exits from the system tray.
 - Show clear sync status: idle, syncing, success, warning, error, offline.
 - Do not block app shutdown indefinitely if final sync fails; log the failure and show a concise warning if appropriate.
 - Keep sync pause/control separate from `Pause AI`. Pausing AI should stop market/AI/background research activity, but should not automatically prevent data sync unless the user explicitly pauses sync too.
 - Use per-device IDs and UTC timestamps for sync conflict handling.
 - Prefer append-only or versioned records for AI runs, job logs, usage logs, market snapshots, and research reports.
+- Do not sync after every individual row insert; mark changed records as dirty and batch them.
+- Use incremental sync based on dirty flags, row versions, or `UpdatedAtUtc > LastSyncedAtUtc`.
+
+Recommended default sync timing:
+
+| Trigger | Timing |
+|---|---|
+| App startup | Immediately. |
+| Manual user edits | Debounced by 30-60 seconds. |
+| AI/deep research completion | Immediately after the task completes. |
+| Broad scan completion | Immediately after the scan completes. |
+| Alert generation | Within 1-2 minutes. |
+| Market price/candle updates | Batched every 15-30 minutes. |
+| API usage and job logs | Batched every 10-15 minutes. |
+| Normal periodic sync | Every 15 minutes by default. |
+| Tray exit | Final sync attempt, capped at 10-20 seconds. |
+| Sync failure or offline mode | Retry with exponential backoff, for example 1 minute, 5 minutes, 15 minutes, then 1 hour. |
+
+Initial defaults:
+
+```text
+Sync interval: 15 minutes
+Debounce delay: 45 seconds
+Exit sync timeout: 15 seconds
+Failure retry: 1 min, 5 min, 15 min, 1 hour
+```
 
 ## Tray Menu MVP
 
