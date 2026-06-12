@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>..\..\assets\default_purple\default_purple.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="..\..\assets\default_purple\default_purple.ico" Link="Assets\default_purple.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\paused_grey\paused_grey.ico" Link="Assets\paused_grey.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\assets\researching_orange\researching_orange.ico" Link="Assets\researching_orange.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.18" />
+  </ItemGroup>
+
+</Project>

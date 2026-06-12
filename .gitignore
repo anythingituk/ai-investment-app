@@ -1,1 +1,7 @@
 non-dev-files/
+bin/
+obj/
+*.user
+*.log
+dist/
+publish/

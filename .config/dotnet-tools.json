@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "innosetup-tool": {
+      "version": "6.2.2",
+      "commands": [
+        "iscc"
+      ],
+      "rollForward": false
+    }
+  }
+}

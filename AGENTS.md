@@ -99,6 +99,13 @@ Security requirements:
 
 The Windows app should support update awareness from GitHub releases.
 
+Release packaging rule:
+
+- When the user asks for a new Windows setup file, also prepare publication to the GitHub Releases page for this project.
+- Produce both a versioned installer asset, for example `AlphaTray-Setup-0.1.0.exe`, and a stable `setup.exe` asset.
+- Upload both assets to the corresponding GitHub release when GitHub CLI/authentication is available.
+- Use the stable `setup.exe` asset as the predictable latest installer download, and the versioned filename for release history.
+
 MVP update behaviour:
 
 - Add an `Check for Updates` command in settings or the tray menu.

@@ -8,19 +8,17 @@ The app is intended to support research and monitoring only. It should not place
 
 ## Current Repository State
 
-This repo is currently design-first rather than implementation-first.
+This repo now has an initial Windows tray app shell plus the earlier design assets.
 
 Included today:
 
+- A .NET 8 WinForms tray app in [`src/AlphaTray.App/`](/mnt/c/dev/ai-investment-app/src/AlphaTray.App)
 - Windows tray icon variants in [`assets/`](/mnt/c/dev/ai-investment-app/assets)
 - A static dashboard mockup in [`mockups/1/`](/mnt/c/dev/ai-investment-app/mockups/1)
 - Product and architecture guidance in [`AGENTS.md`](/mnt/c/dev/ai-investment-app/AGENTS.md)
 
 Not included yet:
 
-- Windows tray application code
-- Local web server or dashboard runtime
-- Database schema or persistence layer
 - Market data integrations
 - AI provider integrations
 - Packaging, installer, or update workflow
@@ -87,6 +85,69 @@ Suggested tray menu for the MVP:
 - `Resume AI`
 - `Settings`
 - `Exit`
+
+## Run The Tray App
+
+Build and run the first Windows tray slice:
+
+```powershell
+dotnet build AlphaTray.sln
+dotnet run --project src\AlphaTray.App
+```
+
+The app binds its local dashboard to `127.0.0.1`, starting at:
+
+```text
+http://127.0.0.1:48720
+```
+
+If that port is already occupied, it tries the next local ports. The tray menu includes `Open Dashboard`, `Run Scan Now`, `Pause AI`, `Resume AI`, `Settings`, and `Exit`.
+
+Current implementation status:
+
+- System tray process with state-specific icons.
+- Embedded ASP.NET Core dashboard server bound to `127.0.0.1`.
+- Dashboard and settings pages with pause/resume and manual scan controls.
+- SQLite settings database at `%LOCALAPPDATA%\AlphaTray\alphatray.db`.
+- Persisted pause/resume state.
+
+## Build The Windows Installer
+
+Build the self-contained Windows setup executable:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\build-installer.ps1 -Version 0.1.0
+```
+
+The setup file is written to:
+
+```text
+dist\installer\AlphaTray-Setup-0.1.0.exe
+dist\installer\setup.exe
+```
+
+The installer is per-user, installs under `%LOCALAPPDATA%\Programs\AlphaTray`, and includes a setup checkbox named `Start AlphaTray when Windows starts`. When selected, it writes an `HKCU` startup entry and removes that entry on uninstall.
+
+The versioned filename is useful for release history. The stable `setup.exe` filename is useful as the predictable GitHub Release asset.
+
+## Publish A GitHub Release
+
+Install and authenticate GitHub CLI first:
+
+```powershell
+gh auth login
+```
+
+Then build the installer and publish both setup assets to GitHub Releases:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\publish-github-release.ps1 -Version 0.1.0
+```
+
+This creates or updates tag `v0.1.0` in `anythingituk/ai-investment-app` and uploads:
+
+- `AlphaTray-Setup-0.1.0.exe`
+- `setup.exe`
 
 ## Notes
 
