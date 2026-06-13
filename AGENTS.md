@@ -78,6 +78,49 @@ SQLite database
 
 For a Windows-first private tool, prefer the .NET stack unless there is a strong reason otherwise.
 
+## AI Model Management
+
+The app should support both hosted AI APIs and optional locally downloaded AI models where practical.
+
+The user should be able to download and manage local AI models in simple size tiers:
+
+| Tier | Intended use | Notes |
+|---|---|---|
+| Small | Fast summaries, tagging, simple classification, headline triage, lightweight research queue notes. | Lowest disk/RAM/GPU requirement. Prefer for frequent background jobs. |
+| Medium | Deeper company research, fundamentals summaries, catalyst analysis, risk summaries, ranking explanations. | Balanced quality and cost. Suitable default for most private research jobs if hardware allows. |
+| Large | Complex multi-source research, detailed bear/bull cases, short thesis review, portfolio/risk reasoning. | Highest resource use. Require explicit user selection and clear warnings about speed, memory, and power usage. |
+
+Model management requirements:
+
+- Show available local models by tier: small, medium, large.
+- Show installed models, disk usage, provider/runtime, quantisation where relevant, and last used time.
+- Allow the user to download, update, remove, and test local models from Settings.
+- Store model metadata locally and avoid downloading large models without explicit user confirmation.
+- Check available disk space before downloads.
+- Allow the user to set a default hosted model and a default local model per job type.
+- Allow fallback rules, for example `Use local medium model, fall back to hosted model if local model is unavailable`.
+- Show whether a job used a local model or hosted API model in AI usage logs.
+- Keep hosted API keys and local model files separate from synced investment research data.
+- Do not assume local models are accurate sources of facts. They must interpret supplied structured data and retrieved documents, not invent prices, fundamentals, or corporate events.
+
+Recommended local model runtime direction:
+
+- Keep the AI provider abstraction independent of the model runtime.
+- Prefer a local runtime that can be launched and stopped cleanly by the Windows app.
+- Support CPU-only use where possible, but show performance warnings.
+- Add GPU acceleration later if the target machine supports it.
+- Make local model downloads optional; the app must still work with hosted AI APIs only.
+
+The Settings page should include an `AI Models` area for:
+
+- Hosted provider configuration.
+- Local model downloads.
+- Model health checks.
+- Default model by job type.
+- Fallback behaviour.
+- Maximum local model disk usage.
+- Whether background jobs may use large models.
+
 ## Localhost Dashboard
 
 The `Open Dashboard` tray command should open a local browser URL, for example:
@@ -372,12 +415,51 @@ Planned agents/services:
 | Ranking Agent | Combines scores into ranked suggestions. |
 | Human Notes Agent | Applies the user's notes, preferences, overrides, and previous decisions. |
 
+## Agent Assignment to Jobs
+
+The user should be able to assign one or more agents to specific jobs from the dashboard or settings.
+
+Examples:
+
+| Job type | Possible agents |
+|---|---|
+| Broad market scan | Universe Scanner, Low-Price Share Agent, Technical Agent, Ranking Agent |
+| Company research | Fundamentals Agent, News Agent, Catalyst Agent, Risk Agent, Human Notes Agent |
+| Financial stats analysis | Fundamentals Agent, Risk Agent, Ranking Agent |
+| Short-watch review | Shorting Agent, Technical Agent, News Agent, Risk Agent |
+| Alert review | News Agent, Catalyst Agent, Technical Agent |
+| Dashboard suggestion refresh | Ranking Agent, Risk Agent, Human Notes Agent |
+
+Agent assignment requirements:
+
+- Let the user enable or disable agents per job type.
+- Let the user choose the model tier or specific model for each agent/job combination.
+- Support hosted, local-small, local-medium, and local-large model choices where available.
+- Show estimated cost, expected runtime, and local resource impact before running expensive jobs.
+- Require explicit confirmation before using a large local model for scheduled background work.
+- Allow manual jobs to override the default model/agent assignment.
+- Store assignment history so AI outputs can be traced back to the agents and models used.
+- Respect `Pause AI`, budget limits, and local model resource limits.
+- Avoid duplicate analysis by multiple agents unless the job explicitly asks for comparison or review.
+- Present each agent's contribution separately where useful, then show the combined ranking or summary.
+
+Initial default assignments:
+
+| Job type | Default assignment |
+|---|---|
+| Broad scan | Rules-based filtering first, then small model shortlist summary if enabled. |
+| Company research | Medium model or hosted deep-research model for selected companies only. |
+| Financial stats analysis | Deterministic calculations first, then small or medium model explanation. |
+| Short-watch review | Medium model plus mandatory risk checks and warning labels. |
+| Dashboard suggestions | Ranking Agent using cached data and low-cost summaries. |
+
 ## AI Design Principles
 
 - AI should interpret and summarise structured data.
 - AI should not be treated as the source of truth for prices, fundamentals, or corporate events.
 - Store the input data snapshot used for each AI analysis where practical.
 - Store AI output, model name, timestamp, estimated token usage, and estimated cost.
+- Store the agent name, job type, model tier, provider, and local/hosted execution mode for each AI output.
 - Every AI suggestion should include reasons and warnings.
 - The app should avoid language such as `Buy this now`.
 - Prefer language such as `Candidate meets long-entry criteria; review for possible entry`.
@@ -395,6 +477,9 @@ Maximum deep research companies per day
 Maximum broad scan AI summaries per day
 Model for broad scans
 Model for deep research
+Default local model tier per job type
+Maximum local model disk usage
+Allow large local models for scheduled jobs
 Automatic pause when budget reaches threshold
 ```
 
@@ -406,6 +491,8 @@ AI spend this month
 Budget remaining
 Estimated monthly run rate
 Current AI mode: Lean / Balanced / Aggressive
+Local model usage today
+Hosted API usage today
 ```
 
 Recommended initial behaviour:
@@ -413,6 +500,8 @@ Recommended initial behaviour:
 - Use code and structured data for broad filtering.
 - Use cheaper/faster models for shortlist summaries.
 - Use stronger models only for selected deep research.
+- Use local small or medium models for frequent low-risk summarisation when quality is acceptable.
+- Use large local models only for explicit deep analysis or manually approved scheduled jobs.
 - Do not run hourly deep research across hundreds of companies.
 - Use hourly checks only for price, news headlines, volume spikes, and trigger detection.
 
@@ -527,6 +616,9 @@ Sectors
 Indexes
 ApiUsageLog
 JobRuns
+AIModels
+AgentDefinitions
+AgentJobAssignments
 ```
 
 Later add:
